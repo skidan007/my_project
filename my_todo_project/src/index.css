@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+
+/* Custom animation for active task */
+@keyframes pulse-light {
+  0%, 100% {
+    box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.4);
+  }
+}
+.animate-pulse-light {
+  animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

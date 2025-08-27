@@ -1,11 +1,19 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Plus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Input, Label, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Switch } from './ui/form-elements';
+import { CATEGORY_ICONS } from '../constants/app';
+import { toast } from './ui/toaster';
 
-export function AddTaskForm() {
+export function AddTaskForm({ onAddTask }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     startTime: '',
-    duration: '30',
+    endTime: '',
+    duration: '',
     category: 'personal',
     isRecurring: false,
     alarmEnabled: true,
@@ -13,110 +21,168 @@ export function AddTaskForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission
+    
+    if (!formData.title || !formData.startTime) {
+      toast.error('Task title and start time are required!');
+      return;
+    }
+
+    onAddTask({
+      title: formData.title,
+      description: formData.description || undefined,
+      startTime: formData.startTime,
+      endTime: formData.endTime || undefined,
+      duration: formData.duration ? parseInt(formData.duration) : undefined,
+      category: formData.category,
+      isRecurring: formData.isRecurring,
+      isCompleted: false,
+      isActive: false,
+      alarmEnabled: formData.alarmEnabled,
+    });
+
+    setFormData({
+      title: '',
+      description: '',
+      startTime: '',
+      endTime: '',
+      duration: '',
+      category: 'personal',
+      isRecurring: false,
+      alarmEnabled: true,
+    });
+    setIsOpen(false);
   };
 
+  if (!isOpen) {
+    return (
+      <Button 
+        onClick={() => setIsOpen(true)}
+        className="w-full"
+        size="lg"
+      >
+        <Plus className="h-4 w-4 mr-2" />
+        Add New Task
+      </Button>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold">Add New Task</h2>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-medium mb-1">Task Title</label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData({...formData, title: e.target.value})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter task title"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Description (Optional)</label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter task description"
-            rows={2}
-          />
-        </div>
-
-        <div className="border-t pt-4">
-          <label className="block font-medium mb-1">Start Time</label>
-          <input
-            type="time"
-            value={formData.startTime}
-            onChange={(e) => setFormData({...formData, startTime: e.target.value})}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Category</label>
-          <select
-            value={formData.category}
-            onChange={(e) => setFormData({...formData, category: e.target.value})}
-            className="w-full p-2 border rounded"
-          >
-            <option value="personal">Personal</option>
-            <option value="work">Work</option>
-            <option value="health">Health</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Duration (minutes)</label>
-          <input
-            type="number"
-            value={formData.duration}
-            onChange={(e) => setFormData({...formData, duration: e.target.value})}
-            className="w-full p-2 border rounded"
-            min="1"
-            required
-          />
-        </div>
-
-        <div className="flex justify-between">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.isRecurring}
-              onChange={(e) => setFormData({...formData, isRecurring: e.target.checked})}
-              className="h-4 w-4"
+    <Card className="rounded-2xl">
+      <CardHeader>
+        <CardTitle>Add New Task</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Task Title</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Enter task title"
+              required
             />
-            <span>Recurring daily</span>
-          </label>
+          </div>
 
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.alarmEnabled}
-              onChange={(e) => setFormData({...formData, alarmEnabled: e.target.checked})}
-              className="h-4 w-4"
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Enter task description"
+              rows={3}
             />
-            <span>Enable alarm</span>
-          </label>
-        </div>
+          </div>
 
-        <div className="flex gap-2 pt-4">
-          <button
-            type="submit"
-            className="flex-1 bg-blue-600 text-white py-2 rounded"
-          >
-            Add Task
-          </button>
-          <button
-            type="button"
-            className="flex-1 bg-gray-200 text-gray-800 py-2 rounded"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startTime">Start Time</Label>
+              <Input
+                id="startTime"
+                type="time"
+                value={formData.startTime}
+                onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Input
+                id="duration"
+                type="number"
+                value={formData.duration}
+                onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+                placeholder="30"
+                min="1"
+                max="480"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select
+              value={formData.category}
+              onValueChange={(value) => 
+                setFormData(prev => ({ ...prev, category: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(CATEGORY_ICONS).map(([key, icon]) => (
+                  <SelectItem key={key} value={key}>
+                    <div className="flex items-center gap-2">
+                      <span>{icon}</span>
+                      <span className="capitalize">{key.replace('-', ' ')}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="recurring"
+                checked={formData.isRecurring}
+                onCheckedChange={(checked) => 
+                  setFormData(prev => ({ ...prev, isRecurring: checked }))
+                }
+              />
+              <Label htmlFor="recurring">Recurring daily</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="alarm"
+                checked={formData.alarmEnabled}
+                onCheckedChange={(checked) => 
+                  setFormData(prev => ({ ...prev, alarmEnabled: checked }))
+                }
+              />
+              <Label htmlFor="alarm">Enable alarm</Label>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button type="submit" className="flex-1">
+              Add Task
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
