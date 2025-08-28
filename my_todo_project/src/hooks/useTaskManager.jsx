@@ -1,33 +1,29 @@
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from '../components/ui/toaster';
+import { ALARM_TONES } from '../constants/app';
 
-// Base64 encoded audio for alarm
-const ALARM_AUDIO_BASE64 = 'data:audio/wav;base64,UklGRl9PRUxCRgBWQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YSAgAAAAAAAAAAAAAAA=' // This is a tiny silent WAV file placeholder
-
-const useTaskManager = () => {
+const useTaskManager = (alarmToneUrl) => {
   const [tasks, setTasks] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const audioRef = useRef(null);
 
   useEffect(() => {
-    // Initialize audio ref for the alarm
     if (!audioRef.current) {
-      const audio = new Audio(ALARM_AUDIO_BASE64);
+      const audio = new Audio(alarmToneUrl);
       audio.loop = true;
       audioRef.current = audio;
     }
-  }, []);
+    audioRef.current.src = alarmToneUrl;
+  }, [alarmToneUrl]);
 
-  // Update current time every minute
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000); // Check every minute
+    }, 60000); 
     return () => clearInterval(timer);
   }, []);
 
-  // Alarm and task activation logic
   useEffect(() => {
     const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
     let hasActiveTask = false;
@@ -42,7 +38,6 @@ const useTaskManager = () => {
 
         const isActiveNow = currentMinutes >= taskStartMinutes && (!task.duration || currentMinutes < taskEndMinutes);
         
-        // If the task becomes active, and an alarm is enabled, play the sound
         if (isActiveNow && !task.isActive && task.alarmEnabled) {
           if (audioRef.current) {
             audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
@@ -50,7 +45,6 @@ const useTaskManager = () => {
           toast.success(`Alarm for "${task.title}"! ⏰`);
         }
         
-        // Mark as overdue if past end time and not completed
         if (taskEndMinutes !== null && currentMinutes >= taskEndMinutes && !task.isCompleted) {
           return { ...task, isOverdue: true };
         }
@@ -60,7 +54,6 @@ const useTaskManager = () => {
         return { ...task, isActive: isActiveNow };
       });
       
-      // Stop alarm if no active task
       if (!hasActiveTask && audioRef.current) {
         audioRef.current.pause();
       }
@@ -97,7 +90,7 @@ const useTaskManager = () => {
           const [startHour, startMinute] = snoozedTask.startTime.split(':').map(Number);
           const newTime = new Date();
           newTime.setHours(startHour);
-          newTime.setMinutes(startMinute + 5); // Snooze for 5 minutes
+          newTime.setMinutes(startMinute + 5); 
 
           const newStartTime = `${String(newTime.getHours()).padStart(2, '0')}:${String(newTime.getMinutes()).padStart(2, '0')}`;
           toast.success(`Snoozed "${snoozedTask.title}" for 5 minutes.`);

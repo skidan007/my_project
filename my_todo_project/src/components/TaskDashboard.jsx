@@ -3,16 +3,22 @@ import { BellOff, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
-export function TaskDashboard({ activeTask, nextTask, currentTime, onCompleteTask, onSnoozeTask }) {
+export function TaskDashboard({ activeTask, nextTask, currentTime, onCompleteTask, onSnoozeTask, is24HourFormat }) {
+  const formattedTime = new Date().toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: !is24HourFormat
+  });
+
   return (
-    <Card className="rounded-2xl p-6 space-y-6">
+    <Card className="rounded-2xl p-6 space-y-6 ">
       <CardHeader>
         <CardTitle>Dashboard</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center">
           <p className="text-sm text-gray-500">Current Time</p>
-          <p className="text-5xl font-extrabold text-blue-600 mt-1">{currentTime}</p>
+          <p className="text-5xl font-extrabold text-blue-600 mt-1">{formattedTime}</p>
         </div>
 
         <div className="space-y-4">

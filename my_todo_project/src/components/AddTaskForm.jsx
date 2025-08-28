@@ -57,10 +57,10 @@ export function AddTaskForm({ onAddTask }) {
     return (
       <Button 
         onClick={() => setIsOpen(true)}
-        className="w-full"
+        className="w-full flex justify-center"
         size="lg"
       >
-        <Plus className="h-4 w-4 mr-2" />
+        <Plus className="h-5 w-5 mr-1" />
         Add New Task
       </Button>
     );
