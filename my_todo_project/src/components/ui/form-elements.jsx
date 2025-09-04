@@ -33,28 +33,57 @@ const Textarea = ({ id, value, onChange, placeholder, rows, className = '' }) =>
 );
 
 const Select = ({ value, onValueChange, children, className = '' }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const selectRef = React.useRef(null);
+  
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (selectRef.current && !selectRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-        className={`w-full p-2 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 pr-8 ${className}`}
+    <div className="relative" ref={selectRef}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full p-2 border border-gray-300 rounded-lg cursor-pointer flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
       >
-        {children}
-      </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-        <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
+        <span>{value}</span>
+        <div className="flex items-center px-2 pointer-events-none">
+          <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
       </div>
+      
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
 
 const SelectTrigger = ({ children }) => <>{children}</>;
-const SelectValue = () => null;
-const SelectContent = ({ children }) => <>{children}</>;
-const SelectItem = ({ children, value }) => <option value={value}>{children}</option>;
+const SelectValue = ({ children }) => <>{children}</>;
+const SelectContent = ({ children }) => <div className="py-1">{children}</div>;
+const SelectItem = ({ children, value, onSelect }) => (
+  <div 
+    className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+    onClick={() => onSelect && onSelect(value)}
+  >
+    {children}
+  </div>
+);
 
 const Switch = ({ id, checked, onCheckedChange, className = '' }) => (
   <button

@@ -129,12 +129,15 @@ export function AddTaskForm({ onAddTask }) {
                 setFormData(prev => ({ ...prev, category: value }))
               }
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
               <SelectContent>
                 {Object.entries(CATEGORY_ICONS).map(([key, icon]) => (
-                  <SelectItem key={key} value={key}>
+                  <SelectItem 
+                    key={key} 
+                    value={key}
+                    onSelect={(value) => 
+                      setFormData(prev => ({ ...prev, category: value }))
+                    }
+                  >
                     <div className="flex items-center gap-2">
                       <span>{icon}</span>
                       <span className="capitalize">{key.replace('-', ' ')}</span>

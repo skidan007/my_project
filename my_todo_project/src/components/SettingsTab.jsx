@@ -39,12 +39,9 @@ export const SettingsTab = ({
             value={currentSettings.theme}
             onValueChange={(value) => onThemeChange(value)}
           >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
+              <SelectItem value="light" onSelect={(value) => onThemeChange(value)}>Light</SelectItem>
+              <SelectItem value="dark" onSelect={(value) => onThemeChange(value)}>Dark</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -55,12 +52,9 @@ export const SettingsTab = ({
             value={currentSettings.timeFormat}
             onValueChange={(value) => onTimeFormatChange(value)}
           >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="12-hour">12-hour (AM/PM)</SelectItem>
-              <SelectItem value="24-hour">24-hour</SelectItem>
+              <SelectItem value="12-hour" onSelect={(value) => onTimeFormatChange(value)}>12-hour (AM/PM)</SelectItem>
+              <SelectItem value="24-hour" onSelect={(value) => onTimeFormatChange(value)}>24-hour</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -71,12 +65,13 @@ export const SettingsTab = ({
             value={currentSettings.alarmTone}
             onValueChange={(value) => onAlarmToneChange(value)}
           >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
             <SelectContent>
               {ALARM_TONES.map((tone) => (
-                <SelectItem key={tone.name} value={tone.url}>
+                <SelectItem 
+                  key={tone.name} 
+                  value={tone.url}
+                  onSelect={(value) => onAlarmToneChange(value)}
+                >
                   {tone.name}
                 </SelectItem>
               ))}

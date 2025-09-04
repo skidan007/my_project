@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Calendar, BarChart3, Settings } from 'lucide-react';
+import { Clock, Calendar, BarChart3, Settings, Check, BellOff } from 'lucide-react';
 import { useTaskManager } from './hooks/useTaskManager';
 import { TaskDashboard } from './components/TaskDashboard';
 import { AddTaskForm } from './components/AddTaskForm';
