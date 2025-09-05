@@ -53,7 +53,7 @@ export default function App() {
   const themeClass = settings.theme === 'dark' ? 'dark' : 'light';
 
   return (
-    <div className={`min-h-screen font-sans flex flex-col items-center ${themeClass}`}>
+    <div className={`min-h-screen font-sans flex flex-col items-center ${themeClass} ${settings.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex justify-between items-center mb-8">
           <div className="text-center w-full">
@@ -79,7 +79,7 @@ export default function App() {
           />
         ) : (
           <Tabs defaultValue="dashboard" className="w-full space-y-6">
-            <TabsList className="grid grid-cols-3 ">
+            <TabsList className="grid grid-cols-3 max-w-md mx-auto">
               <TabsTrigger value="dashboard" className="flex items-center gap-2 ">
                 <Clock className="h-4 w-4" />
                 Dashboard

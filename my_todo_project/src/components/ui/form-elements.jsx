@@ -50,23 +50,43 @@ const Select = ({ value, onValueChange, children, className = '' }) => {
     };
   }, []);
 
+  const handleItemSelect = (selectedValue) => {
+    if (onValueChange) {
+      onValueChange(selectedValue);
+    }
+    setIsOpen(false); // Close dropdown after selection
+  };
+
   return (
     <div className="relative" ref={selectRef}>
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full p-2 border border-gray-300 rounded-lg cursor-pointer flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+        className={`w-full p-2 border border-gray-300 rounded-lg cursor-pointer flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${className} dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
       >
         <span>{value}</span>
         <div className="flex items-center px-2 pointer-events-none">
-          <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg 
+            className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </div>
       </div>
       
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
-          {children}
+        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out origin-top dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+          {React.Children.map(children, (child) => {
+            if (child.type === SelectContent) {
+              return React.cloneElement(child, {
+                onItemSelect: handleItemSelect
+              });
+            }
+            return child;
+          })}
         </div>
       )}
     </div>
@@ -75,11 +95,25 @@ const Select = ({ value, onValueChange, children, className = '' }) => {
 
 const SelectTrigger = ({ children }) => <>{children}</>;
 const SelectValue = ({ children }) => <>{children}</>;
-const SelectContent = ({ children }) => <div className="py-1">{children}</div>;
-const SelectItem = ({ children, value, onSelect }) => (
+const SelectContent = ({ children, onItemSelect }) => (
+  <div className="py-1 max-h-60 overflow-y-auto">
+    {React.Children.map(children, (child) => {
+      if (child.type === SelectItem) {
+        return React.cloneElement(child, {
+          onItemSelect: onItemSelect
+        });
+      }
+      return child;
+    })}
+  </div>
+);
+const SelectItem = ({ children, value, onSelect, onItemSelect }) => (
   <div 
-    className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-    onClick={() => onSelect && onSelect(value)}
+    className="px-3 py-2 hover:bg-blue-100 cursor-pointer transition-colors duration-200 dark:hover:bg-blue-900"
+    onClick={() => {
+      if (onSelect) onSelect(value);
+      if (onItemSelect) onItemSelect(value);
+    }}
   >
     {children}
   </div>
